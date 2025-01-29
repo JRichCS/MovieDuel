@@ -4,7 +4,6 @@ import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import ReactNavbar from 'react-bootstrap/Navbar';
 
-
 // Here, we display our Navbar
 export default function Navbar() {
   // We are pulling in the user's info but not using it for now.
