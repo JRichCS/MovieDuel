@@ -4,6 +4,7 @@ import { Route, Routes } from "react-router-dom";
 import './css/card.css';
 import './index.css';
 
+
 // We import all the components we need in our app
 import Navbar from "./components/navbar";
 import LandingPage from "./components/pages/landingPage";
@@ -13,6 +14,9 @@ import Signup from "./components/pages/registerPage";
 import PrivateUserProfile from "./components/pages/privateUserProfilePage";
 import { createContext, useState, useEffect } from "react";
 import getUserInfo from "./utilities/decodeJwt";
+import MbtaAlertsPage from "./components/pages/mbtaAlerts";
+import MbtaNew from "./components/pages/mbtaNew";
+
 
 export const UserContext = createContext();
 //test change
@@ -34,6 +38,8 @@ const App = () => {
           <Route exact path="/login" element={<Login />} />
           <Route exact path="/signup" element={<Signup />} />
           <Route path="/privateUserProfile" element={<PrivateUserProfile />} />
+          <Route exact path="/mbtaAlerts" element={<MbtaAlertsPage />} />
+          <Route exact path="/mbtaNew" element={<MbtaNew />} />
         </Routes>
       </UserContext.Provider>
     </>
