@@ -1,0 +1,33 @@
+const express = require("express");
+const router = express.Router();
+const favoriteMoviesModel = require("../models/favoriteMoviesModel");
+
+// Route to remove a movie from favorites
+router.post("/remove", async (req, res) => {
+  const { userId, movieId } = req.body;
+
+  // Find the user's favorite movies list
+  let favoriteMovies = await favoriteMoviesModel.findOne({ userId });
+
+  if (!favoriteMovies) {
+    return res.status(400).json({ message: "User has no favorite movies list." });
+  }
+
+  // Find the movie in the favorites list
+  const movieIndex = favoriteMovies.movies.findIndex((movie) => movie.movieId === movieId);
+
+  if (movieIndex === -1) {
+    return res.status(400).json({ message: "Movie not found in favorites." });
+  }
+
+  // Remove the movie from the list
+  favoriteMovies.movies.splice(movieIndex, 1);
+
+  // Save the updated list
+  await favoriteMovies.save();
+
+  // Respond with a success message
+  res.status(200).json({ message: "Movie removed from favorites successfully.", favoriteMovies });
+});
+
+module.exports = router;
