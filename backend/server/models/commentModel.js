@@ -5,32 +5,29 @@ const commentSchema = new mongoose.Schema(
   {
     userId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "users",
+      ref: "User", // Ensure this matches your User model
       required: true,
     },
-    movies: [
-      {
-        movieId: {
-          type: Number, // Change this if using ObjectId for movies
-          required: true,
-        },
-        title: {
-          type: String,
-          required: true,
-        },
-        addedAt: {
-          type: Date,
-          default: Date.now,
-        },
+    movie: {
+      movieId: {
+        type: Number, // Change to ObjectId if movies are in a separate collection
+        required: true,
       },
-    ],
-    comment: {
+      title: {
         type: String,
         required: true,
-
-    }
+      },
+    },
+    comment: {
+      type: String,
+      required: true,
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
   },
   { collection: "movieComments" }
 );
 
-module.exports = mongoose.model("movieComments", commentSchema);
+module.exports = mongoose.model("Comment", commentSchema, "movieComments");
