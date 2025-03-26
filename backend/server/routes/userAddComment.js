@@ -1,31 +1,23 @@
 const express = require("express");
 const router = express.Router();
-const commentModel = require("../models/commentModel");
+const Comment = require("../models/commentModel");
 
-// Route to add a comment for a movie
-router.post("/comment", async (req, res) => {
+// Add a comment
+router.post("/movies/:movieId/comments", async (req, res) => {
   try {
-    const { userId, movieId, title, comment } = req.body;
+    const { text, userId } = req.body;
+    const { movieId } = req.params;
 
-    // If any fields are empty return error
-    if (!userId || !movieId || !title || !comment) {
-      return res.status(400).json({ message: "All fields are required." });
+    if (!text || !userId) {
+      return res.status(400).json({ error: "Text and userId are required" });
     }
 
-    // Create a new comment document
-    const newComment = new commentModel({
-      userId,
-      movie: { movieId, title },
-      comment,
-    });
-
-    // Save comment to the database
+    const newComment = new Comment({ movieId, userId, text });
     await newComment.save();
 
-    res.status(201).json({ message: "Comment added successfully.", newComment });
-  } catch (error) {
-    console.error("Error adding comment:", error);
-    res.status(500).json({ message: "Internal server error." });
+    res.status(201).json(newComment);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
 

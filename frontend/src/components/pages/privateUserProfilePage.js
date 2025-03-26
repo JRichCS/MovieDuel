@@ -6,7 +6,7 @@ import getUserInfo from "../../utilities/decodeJwt";
 
 
 //link to service
-//http://localhost:8096/privateUserProfile
+//http://localhost:8081/privateUserProfile
 
 const PrivateUserProfile = () => {
   const [show, setShow] = useState(false);
