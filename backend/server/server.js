@@ -15,7 +15,7 @@ const removeFavorite = require("./routes/userRemoveFavorite");
 
 const commentsRoutes = require("./routes/userAddComment");
 
-
+const addComment = require("./routes/userAddComment")
 
 
 require('dotenv').config();
@@ -33,9 +33,6 @@ app.use('/user', deleteUser)
 
 app.use("/favorites", addFavorites);
 app.use("/favorites", removeFavorite);
-
-app.use("/api", commentsRoutes); 
-
 
 
 
