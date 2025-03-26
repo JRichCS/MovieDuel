@@ -74,3 +74,16 @@ Content-Type: application/json
   "movieId": 12345
   
 }
+
+
+### Add a comment
+POST http://localhost:8081/api/movies/tt0084787/comments
+Content-Type: application/json
+
+{
+  "userId": "65d5f3d2a3b4d8e1a2c9e4f6",
+  "text": "This movie was amazing!"
+}
+
+### Get comments for a movie
+GET http://localhost:8081/api/movies/tt0084787/comments
