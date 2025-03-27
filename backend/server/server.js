@@ -34,6 +34,7 @@ app.use('/user', deleteUser)
 app.use("/favorites", addFavorites);
 app.use("/favorites", removeFavorite);
 
+app.use("/api", commentsRoutes); 
 
 
 app.listen(SERVER_PORT, (req, res) => {
