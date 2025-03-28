@@ -13,10 +13,8 @@ const addFavorites = require("./routes/userAddFavorite");
 const removeFavorite = require("./routes/userRemoveFavorite");
 
 
-const commentsRoutes = require("./routes/userAddComment");
-
-const addComment = require("./routes/userAddComment")
-
+const addcommentsRoute = require("./routes/userAddComment");
+const getcommentRoute = require("./routes/userGetComment")
 
 require('dotenv').config();
 const SERVER_PORT = 8081
@@ -34,7 +32,8 @@ app.use('/user', deleteUser)
 app.use("/favorites", addFavorites);
 app.use("/favorites", removeFavorite);
 
-app.use("/api", commentsRoutes); 
+app.use("/api", addcommentsRoute); 
+app.use("/api", getcommentRoute)
 
 
 app.listen(SERVER_PORT, (req, res) => {
