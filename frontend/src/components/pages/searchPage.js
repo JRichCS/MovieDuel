@@ -1,37 +1,36 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
+import getUserInfo from "../../utilities/decodeJwt";
 
 const SearchMovie = () => {
   const [movie, setMovie] = useState(null);
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
-  const [userId] = useState('65d5f3d2a3b4d8e1a2c9e4f6'); // Replace with actual user ID
+  const [user, setUser] = useState(null);
   const [title, setTitle] = useState('Inception');
   const [error, setError] = useState(null);
   const [isFavorited, setIsFavorited] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchMovie();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const userInfo = getUserInfo();
+    if (userInfo) setUser(userInfo);
   }, []);
 
-  // Fetch movie details
   const fetchMovie = async () => {
-
-    const apiKey = process.env.REACT_APP_OMDB_API_KEY; // Grab API key from .env file
-
+    const apiKey = process.env.REACT_APP_OMDB_API_KEY;
     if (!title.trim()) {
       alert("Please enter a movie title.");
       return;
     }
 
-    const url = `https://www.omdbapi.com/?apikey=${apiKey}&t=${encodeURIComponent(title)}`;
-
     try {
-      const response = await fetch(url);
+      const response = await fetch(`https://www.omdbapi.com/?apikey=${apiKey}&t=${encodeURIComponent(title)}`);
       const data = await response.json();
 
       if (data.Response === "False") {
@@ -43,6 +42,7 @@ const SearchMovie = () => {
         setError(null);
         fetchComments(data.imdbID); // Fetch comments for the movie
         checkIfFavorited(data.imdbID);
+
       }
     } catch (error) {
       console.error("Error fetching movie:", error);
@@ -52,19 +52,14 @@ const SearchMovie = () => {
     }
   };
 
-  // Fetch comments from backend
   const fetchComments = async (movieId) => {
     try {
       const response = await axios.get(`http://localhost:8081/api/movies/${movieId}/comments`);
+      console.log("Comments data:", response.data); // Debugging line
       setComments(response.data);
     } catch (error) {
-      // If no comments found, set comments as an empty array
-      if (error.response && error.response.status === 404) {
-        setComments([]);
-      } else {
-        console.error("Error fetching comments:", error);
-        setComments([]);
-      }
+      console.error("Error fetching comments:", error);
+      setComments([]);
     }
   };
 
@@ -113,100 +108,176 @@ const SearchMovie = () => {
     }
   };
 
-  
-  
 
-  // Add new comment to the backend
   const addComment = async () => {
     if (!newComment.trim()) return alert("Comment cannot be empty.");
-
+    if (!user) {
+      alert("You must be logged in to comment.");
+      navigate('/login');
+      return;
+    }
+  
     try {
-      const response = await axios.post(`http://localhost:8081/api/movies/${movie.imdbID}/comments`, {
-        text: newComment,
-        userId, // This should be a valid ObjectId string
-      });
-
-      // Add the new comment to the existing list of comments
-      setComments([...comments, response.data]);
-      setNewComment(""); // Clear the input field
+      const response = await axios.post(
+        `http://localhost:8081/api/movies/${movie.imdbID}/comments`,
+        {
+          text: newComment,
+          userId: user.id,
+          username: user.username // Ensure username is included
+        }
+      );
+      
+      // Force include username in frontend state
+      setComments([{
+        ...response.data,
+        username: user.username
+      }, ...comments]);
+      setNewComment("");
     } catch (error) {
       console.error("Error adding comment:", error);
       alert("Failed to add comment.");
     }
   };
 
+  const deleteComment = async (commentId) => {
+    if (!user) {
+      alert("You must be logged in to delete comments.");
+      navigate('/login');
+      return;
+    }
+  
+    try {
+      const response = await axios.delete(
+        `http://localhost:8081/api/movies/${movie.imdbID}/comments/${commentId}`,
+        { 
+          data: { 
+            userId: user.id 
+          } 
+        }
+      );
+  
+      if (response.status === 200) {
+        setComments(comments.filter(c => c._id !== commentId));
+        alert("Comment deleted successfully");
+      }
+    } catch (error) {
+      console.error("Delete error:", error);
+      
+      // Enhanced error handling
+      if (error.response) {
+        if (error.response.status === 403) {
+          alert(error.response.data.error);
+        } else if (error.response.status === 404) {
+          alert("Comment not found - it may have already been deleted");
+        } else {
+          alert("Failed to delete comment. Please try again.");
+        }
+      } else {
+        alert("Network error - please check your connection");
+      }
+    }
+  };
+
   return (
-    <div className="container text-center mt-4">
-      <h1>Movie Information</h1>
+    <div className="container mt-4">
+      <h1 className="text-center">Movie Information</h1>
       <div className="d-flex justify-content-center mb-3">
-        <input
+        <Form.Control
           type="text"
           placeholder="Enter movie title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className="form-control w-50"
+          className="w-50"
         />
         <Button onClick={fetchMovie} variant="primary" className="ms-2">
           Search
         </Button>
       </div>
-
-      {error && <p className="text-danger mt-3">{error}</p>}
-
+  
+      {error && <p className="text-danger text-center">{error}</p>}
+  
       {movie && (
-        <>
-          <Card className="mt-4" style={{ width: '18rem', margin: 'auto' }}>
-            <Card.Img variant="top" src={movie.Poster} alt={movie.Title} />
-            <Card.Body>
-              <Card.Title>{movie.Title} ({movie.Year})</Card.Title>
-              <Card.Text>
-                <strong>Genre:</strong> {movie.Genre} <br />
-                <strong>Director:</strong> {movie.Director} <br />
-                <strong>Plot:</strong> {movie.Plot}
-              </Card.Text>
-
-              {/* Favorite Button */}
-              <Button
-                variant={isFavorited ? "danger" : "warning"}
-                onClick={isFavorited ? removeFromFavorites : addToFavorites}
-              >
-                 {isFavorited ? "Remove from Favorites" : "Add to Favorites"}
-              </Button>
-
-            </Card.Body>
-          </Card>
-
-          {/* Comment Section */}
-          <div className="mt-4">
-            <h3>Comments</h3>
-            {comments.length > 0 ? (
-              comments.map((comment, index) => (
-                <div key={index} className="border p-2 my-2">
-                  <strong>User {comment.userId}:</strong> {comment.text}
                 </div>
-              ))
-            ) : (
-              <p>No comments yet. Be the first to add one!</p>
-            )}
+                
+                {/* Movie info on the right */}
+                <Card.Body className="p-3">
+                  <Card.Title>{movie.Title} ({movie.Year})</Card.Title>
+                  <Card.Text>
+                    <strong>Genre:</strong> {movie.Genre}<br />
+                    <strong>Director:</strong> {movie.Director}<br />
+                    <strong>Plot:</strong> {movie.Plot}
+                  </Card.Text>
 
-            <Form className="mt-3">
-              <Form.Group>
-                <Form.Control
-                  type="text"
-                  placeholder="Write a comment..."
-                  value={newComment}
-                  onChange={(e) => setNewComment(e.target.value)}
-                />
-              </Form.Group>
-              <Button onClick={addComment} variant="success" className="mt-2">
-                Add Comment
-              </Button>
-            </Form>
+                  {/* Favorite Button */}
+                  <Button
+                     variant={isFavorited ? "danger" : "warning"}
+                     onClick={isFavorited ? removeFromFavorites : addToFavorites}
+                  >
+                 {isFavorited ? "Remove from Favorites" : "Add to Favorites"}
+                 </Button>
+
+                </Card.Body>
+              </div>
+            </Card>
           </div>
-        </>
+  
+          {/* Comments Section - Right Side */}
+          <div className="col-md-6">
+            <div className="mt-4">
+              <h3>Comments</h3>
+              {comments.length > 0 ? (
+                comments.map((comment) => (
+                  <div key={comment._id} className="border p-3 my-2 position-relative">
+                    <div className="d-flex justify-content-between align-items-start">
+                      <div>
+                        <div className="d-flex align-items-center mb-2">
+                          <span className="badge bg-primary me-2">
+                            {comment.username || `User_${comment.userId?.toString().slice(-4)}`}
+                          </span>
+                          {comment.createdAt && (
+                            <small className="text-muted">
+                              {new Date(comment.createdAt).toLocaleString()}
+                            </small>
+                          )}
+                        </div>
+                        <p className="mb-0">{comment.text}</p>
+                      </div>
+                      {user?.id === comment.userId && (
+                        <Button
+                          variant="outline-danger"
+                          size="sm"
+                          onClick={() => deleteComment(comment._id)}
+                        >
+                          Delete
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p>No comments yet. {user ? 'Be the first to add one!' : 'Log in to add a comment.'}</p>
+              )}
+  
+              {user && (
+                <Form className="mt-3">
+                  <Form.Group>
+                    <Form.Control
+                      as="textarea"
+                      rows={3}
+                      placeholder="Write a comment..."
+                      value={newComment}
+                      onChange={(e) => setNewComment(e.target.value)}
+                    />
+                  </Form.Group>
+                  <Button onClick={addComment} variant="success" className="mt-2">
+                    Add Comment
+                  </Button>
+                </Form>
+              )}
+            </div>
+          </div>
+        </div>
       )}
     </div>
-  );
-};
-
+  );}
 export default SearchMovie;
