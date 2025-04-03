@@ -54,26 +54,21 @@ Content-Type: application/json
 }
 
 
-
-### Like a Movie (Add to Favorites) WORKING
-POST http://localhost:8081/favorites/like
+### Like a Movie (Add to Favorites)
+POST http://localhost:8081/user/635ab8dfc407faf9f73deaf1/favorites
 Content-Type: application/json
 
 {
-  "userId": "635ab8dfc407faf9f73deaf1",
-  "movieId": 12345,
+  "movieId": "tt1637725",
   "title": "Inception"
 }
 
 ### Remove a movie from favorites
-POST http://localhost:8081/favorites/remove
+DELETE http://localhost:8081/user/635ab8dfc407faf9f73deaf1/favorites/tt1637725
 Content-Type: application/json
 
-{
-  "userId": "635ab8dfc407faf9f73deaf1",
-  "movieId": 12345
-  
-}
+### Get a user's favorite movies
+GET http://localhost:8081/user/635ab8dfc407faf9f73deaf1/favorites
 
 
 ### Add a comment

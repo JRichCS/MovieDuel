@@ -1,17 +1,16 @@
 const mongoose = require("mongoose");
 
-// Favorite Movies Schema
 const favoriteMoviesSchema = new mongoose.Schema(
   {
     userId: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId, // Ensure consistency
       ref: "users",
       required: true,
     },
     movies: [
       {
         movieId: {
-          type: Number, // Change this if using ObjectId for movies
+          type: String, // Ensure this matches the request payload
           required: true,
         },
         title: {
@@ -28,4 +27,4 @@ const favoriteMoviesSchema = new mongoose.Schema(
   { collection: "favoriteMovies" }
 );
 
-module.exports = mongoose.model("favoriteMovies", favoriteMoviesSchema);
+module.exports = mongoose.model("FavoriteMovies", favoriteMoviesSchema);

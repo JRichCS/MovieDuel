@@ -9,8 +9,10 @@ const dbConnection = require('./config/db.config')
 const editUser = require('./routes/userEditUser')
 const deleteUser = require('./routes/userDeleteAll')
 
-const addFavorites = require("./routes/userAddFavorite");
-const removeFavorite = require("./routes/userRemoveFavorite");
+const favoritesRoute = require("./routes/userFavorites.js");
+
+
+
 
 
 const addcommentsRoute = require("./routes/userAddComment");
@@ -32,8 +34,8 @@ app.use('/user', getUserByIdRoute)
 app.use('/user', editUser)
 app.use('/user', deleteUser)
 
-app.use("/favorites", addFavorites);
-app.use("/favorites", removeFavorite);
+app.use("/user", favoritesRoute);
+
 
 app.use("/api", addcommentsRoute); 
 app.use("/api", getcommentsRoute);
