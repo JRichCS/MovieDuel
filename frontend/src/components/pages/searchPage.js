@@ -11,6 +11,7 @@ const SearchMovie = () => {
   const [userId] = useState('65d5f3d2a3b4d8e1a2c9e4f6'); // Replace with actual user ID
   const [title, setTitle] = useState('Inception');
   const [error, setError] = useState(null);
+  const [isFavorited, setIsFavorited] = useState(false);
 
   useEffect(() => {
     fetchMovie();
@@ -41,6 +42,7 @@ const SearchMovie = () => {
         setMovie(data);
         setError(null);
         fetchComments(data.imdbID); // Fetch comments for the movie
+        checkIfFavorited(data.imdbID);
       }
     } catch (error) {
       console.error("Error fetching movie:", error);
@@ -65,6 +67,54 @@ const SearchMovie = () => {
       }
     }
   };
+
+  const checkIfFavorited = async (movieId) => {
+    try {
+      const response = await axios.get(`http://localhost:8081/user/${userId}/favorites`);
+
+      const favorites = response.data;
+      
+      setIsFavorited(favorites.some(fav => fav.movieId === movieId));
+    } catch (error) {
+      console.error("Error checking favorites:", error.response || error);
+    }
+  };
+  
+  
+
+  const addToFavorites = async () => {
+    if (!movie) return;
+  
+    try {
+      await axios.post(`http://localhost:8081/user/${userId}/favorites`, {
+        movieId: movie.imdbID,
+        title: movie.Title
+      });
+  
+      setIsFavorited(true);
+      alert(`${movie.Title} has been added to favorites!`);
+    } catch (error) {
+      console.error("Error checking favorites:", error.response || error);
+      alert("Failed to add movie to favorites.");
+    }
+  };
+
+  const removeFromFavorites = async () => {
+    if (!movie) return;
+  
+    try {
+      await axios.delete(`http://localhost:8081/user/${userId}/favorites/${movie.imdbID}`);
+  
+      setIsFavorited(false);
+      alert(`${movie.Title} has been removed from favorites.`);
+    } catch (error) {
+      console.error("Error removing from favorites:", error);
+      alert("Failed to remove movie from favorites.");
+    }
+  };
+
+  
+  
 
   // Add new comment to the backend
   const addComment = async () => {
@@ -114,6 +164,15 @@ const SearchMovie = () => {
                 <strong>Director:</strong> {movie.Director} <br />
                 <strong>Plot:</strong> {movie.Plot}
               </Card.Text>
+
+              {/* Favorite Button */}
+              <Button
+                variant={isFavorited ? "danger" : "warning"}
+                onClick={isFavorited ? removeFromFavorites : addToFavorites}
+              >
+                 {isFavorited ? "Remove from Favorites" : "Add to Favorites"}
+              </Button>
+
             </Card.Body>
           </Card>
 
