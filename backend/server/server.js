@@ -1,6 +1,8 @@
 const express = require("express");
 const app = express();
 const cors = require('cors')
+
+const userProfilePictureRoutes = require("./routes/userProfilePicture");
 const loginRoute = require('./routes/userLogin')
 const getAllUsersRoute = require('./routes/userGetAllUsers')
 const registerRoute = require('./routes/userSignUp')
@@ -40,6 +42,8 @@ app.use("/user", favoritesRoute);
 app.use("/api", addcommentsRoute); 
 app.use("/api", getcommentsRoute);
 app.use("/api", deletecommentRoute);
+
+app.use("/api/userProfilePicture", userProfilePictureRoutes);
 
 app.get('/api/movies', async (req, res) => {
     const { title } = req.query;
