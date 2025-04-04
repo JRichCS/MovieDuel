@@ -34,15 +34,15 @@ export default function Navbar() {
           <Nav.Link href="/search">Search</Nav.Link>
         </Nav>
 
-        {user.id && (
-          <img
-            src={profilePicture || "https://via.placeholder.com/50"}
-            alt="Profile"
-            className="rounded-circle"
-            width="50"
-            height="50"
-          />
-        )}
+        {user?.id && (
+  <img
+    src={profilePicture}
+    alt="Profile"
+    className="rounded-circle"
+    width="50"
+    height="50"
+  />
+)}
       </Container>
     </ReactNavbar>
   );
