@@ -10,19 +10,15 @@ import Navbar from "./components/navbar";
 import LandingPage from "./components/pages/landingPage";
 import HomePage from "./components/pages/homePage";
 import Login from "./components/pages/loginPage";
-import Signup from "./components/pages/registerPage";
 import PrivateUserProfile from "./components/pages/privateUserProfilePage";
 import { createContext, useState, useEffect } from "react";
 import getUserInfo from "./utilities/decodeJwt";
-import MbtaAlertsPage from "./components/pages/mbtaAlerts";
-import MbtaNew from "./components/pages/mbtaNew";
+
 
 import SearchMovie from "./components/pages/searchPage";
 
 
 export const UserContext = createContext();
-//test change
-//test again
 const App = () => {
   const [user, setUser] = useState();
 
@@ -38,11 +34,7 @@ const App = () => {
           <Route exact path="/" element={<LandingPage />} />
           <Route exact path="/home" element={<HomePage />} />
           <Route exact path="/login" element={<Login />} />
-          <Route exact path="/signup" element={<Signup />} />
           <Route path="/privateUserProfile" element={<PrivateUserProfile />} />
-          <Route exact path="/mbtaAlerts" element={<MbtaAlertsPage />} />
-          <Route exact path="/mbtaNew" element={<MbtaNew />} />
-
           <Route exact path="/search" element={<SearchMovie />} />
         </Routes>
       </UserContext.Provider>
