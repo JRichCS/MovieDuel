@@ -16,6 +16,8 @@ const userLoginValidation = data => {
   const loginValidationSchema = z.object({
     username : z.string().min(6, 'Username must be 6 characters or more'),
     password: z.string().min(8, 'Password must be 8 or more characters').trim(),
+    role: z.enum(['user', 'admin']).optional().default('user')
+
   });
   return loginValidationSchema.safeParse(data)
 };

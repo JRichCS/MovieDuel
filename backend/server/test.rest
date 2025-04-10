@@ -83,3 +83,7 @@ Content-Type: application/json
 
 ### Get comments for a movie
 GET http://localhost:8081/api/movies/tt0084787/comments
+
+
+### Get movie info
+GET http://localhost:8080/api/movie?title=Inception
