@@ -6,18 +6,20 @@ const cors = require('cors');
 const app = express();
 app.use(cors());
 
+// To grab movie info go to link and use port 8080
 const PORT = 8080;
 const API_KEY = process.env.OMDB_API_KEY;
 
 // Initialize a router instance
 const router = express.Router();
 
-// Define the route in the router instance
+// Route to grab movie info from OMDB API
 router.get('/api/movie', async (req, res) => {
     const { title } = req.query;
 
     if (!title) return res.status(400).json({ error: 'Missing movie title' });
 
+    // Will grab json info of searched movie
     try {
         const url = `https://www.omdbapi.com/?apikey=${API_KEY}&t=${encodeURIComponent(title)}`;
         const response = await axios.get(url);
@@ -35,7 +37,7 @@ router.get('/api/movie', async (req, res) => {
 });
 
 // Use the router for API routes
-app.use(router);  // This line correctly adds the router as middleware
+app.use(router);
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);

@@ -22,17 +22,6 @@ GET http://localhost:8081/user/getAll
 Content-Type: application/json
 
 ###
-
-POST http://localhost:8081/user/editUser
-Content-Type: application/json 
-
-{
-    "userId" : "635ab8dfc407faf9f73deaf2",
-    "username" : "Tochi Edit",
-    "password" : "dwwrwr"
-}
-
-###
 GET  http://localhost:8081/user/getUserById
 Content-Type: application/json 
 
