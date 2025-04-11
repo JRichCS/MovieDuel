@@ -30,6 +30,7 @@ export default function Navbar() {
           <Nav.Link href="/home">Home</Nav.Link>
           <Nav.Link href="/privateUserProfile">Profile</Nav.Link>
           <Nav.Link href="/search">Search</Nav.Link>
+          <Nav.Link href="/game">Game</Nav.Link>
         </Nav>
 
         {user?.id && (

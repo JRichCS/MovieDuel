@@ -4,11 +4,19 @@ const cors = require('cors');
 const axios = require('axios');
 
 const userProfilePictureRoutes = require("./routes/userProfilePicture");
-const loginRoute = require('./routes/userLogin');
-const registerRoute = require('./routes/userSignUp');
-const getUserByIdRoute = require('./routes/userGetUserById');
-const dbConnection = require('./config/db.config');
-const deleteUser = require('./routes/userDeleteAll');
+
+const loginRoute = require('./routes/userLogin')
+const getAllUsersRoute = require('./routes/userGetAllUsers')
+const registerRoute = require('./routes/userSignUp')
+const getUserByIdRoute = require('./routes/userGetUserById')
+const dbConnection = require('./config/db.config')
+const editUser = require('./routes/userEditUser')
+const deleteUser = require('./routes/userDeleteAll')
+
+const favoritesRoute = require("./routes/userFavorites");
+const movieRoutes = require('./routes/movieRoutes');
+const gameScoreRoutes = require('./routes/gameScores'); // Adjust path if needed
+
 
 const favoritesRoute = require("./routes/userFavorites");
 const addcommentsRoute = require("./routes/userAddComment");
@@ -28,6 +36,8 @@ app.use('/user', registerRoute);
 app.use('/user', getUserByIdRoute);
 app.use('/user', deleteUser);
 app.use("/user", favoritesRoute);
+app.use('/api', movieRoutes);
+app.use("/api/game", gameScoreRoutes);
 
 app.use("/api", addcommentsRoute); 
 app.use("/api", getcommentsRoute);

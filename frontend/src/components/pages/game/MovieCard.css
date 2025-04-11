@@ -1,0 +1,10 @@
+/* MovieCard.css */
+.movie-card {
+    width: 300px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+  }
+  
+  .movie-card:hover {
+    transform: scale(1.05);
+  }
