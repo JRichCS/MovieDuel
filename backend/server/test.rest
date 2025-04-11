@@ -83,3 +83,23 @@ Content-Type: application/json
 
 ### Get comments for a movie
 GET http://localhost:8081/api/movies/tt0084787/comments
+
+
+### Submit a new score for a user
+POST http://localhost:8081/api/game/65d5f3d2a3b4d8e1a2c9e4f6/score
+Content-Type: application/json
+
+{
+  "score": 7,
+  "username": "test"
+}
+
+###
+
+### Get top score for a user
+GET http://localhost:8081/api/game/65d5f3d2a3b4d8e1a2c9e4f6/scores
+
+###
+
+### Get top 10 leaderboard scores
+GET http://localhost:8081/api/game/leaderboard

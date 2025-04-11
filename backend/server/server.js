@@ -11,8 +11,9 @@ const dbConnection = require('./config/db.config')
 const editUser = require('./routes/userEditUser')
 const deleteUser = require('./routes/userDeleteAll')
 
-const favoritesRoute = require("./routes/userFavorites.js");
-
+const favoritesRoute = require("./routes/userFavorites");
+const movieRoutes = require('./routes/movieRoutes');
+const gameScoreRoutes = require('./routes/gameScores'); // Adjust path if needed
 
 
 
@@ -37,6 +38,8 @@ app.use('/user', editUser)
 app.use('/user', deleteUser)
 
 app.use("/user", favoritesRoute);
+app.use('/api', movieRoutes);
+app.use("/api/game", gameScoreRoutes);
 
 
 app.use("/api", addcommentsRoute); 

@@ -15,7 +15,9 @@ import { createContext, useState, useEffect } from "react";
 import getUserInfo from "./utilities/decodeJwt";
 
 
+
 import SearchMovie from "./components/pages/searchPage";
+import GamePage from './components/pages/game/GamePage';
 
 
 export const UserContext = createContext();
@@ -36,6 +38,10 @@ const App = () => {
           <Route exact path="/login" element={<Login />} />
           <Route path="/privateUserProfile" element={<PrivateUserProfile />} />
           <Route exact path="/search" element={<SearchMovie />} />
+          <Route path="/game" element={<GamePage />} />
+ 
+
+
         </Routes>
       </UserContext.Provider>
     </>
