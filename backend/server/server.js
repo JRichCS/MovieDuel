@@ -1,8 +1,10 @@
 const express = require("express");
 const app = express();
-const cors = require('cors')
+const cors = require('cors');
+const axios = require('axios');
 
 const userProfilePictureRoutes = require("./routes/userProfilePicture");
+
 const loginRoute = require('./routes/userLogin')
 const getAllUsersRoute = require('./routes/userGetAllUsers')
 const registerRoute = require('./routes/userSignUp')
@@ -16,55 +18,56 @@ const movieRoutes = require('./routes/movieRoutes');
 const gameScoreRoutes = require('./routes/gameScores'); // Adjust path if needed
 
 
-
-
+const favoritesRoute = require("./routes/userFavorites");
 const addcommentsRoute = require("./routes/userAddComment");
-const getcommentsRoute = require("./routes/userGetComment")
-const deletecommentRoute = require("./routes/userDeleteComment")
-
+const getcommentsRoute = require("./routes/userGetComment");
+const deletecommentRoute = require("./routes/userDeleteComment");
+const proxyRoute = require("./routes/proxy");
 
 require('dotenv').config();
-const SERVER_PORT = 8081
+const SERVER_PORT = 8081;
 
-dbConnection()
+dbConnection();
 
-app.use(cors({origin: '*'}))
-app.use(express.json())
-app.use('/user', loginRoute)
-app.use('/user', registerRoute)
-app.use('/user', getAllUsersRoute)
-app.use('/user', getUserByIdRoute)
-app.use('/user', editUser)
-app.use('/user', deleteUser)
-
+app.use(cors({ origin: '*' }));
+app.use(express.json());
+app.use('/user', loginRoute);
+app.use('/user', registerRoute);
+app.use('/user', getUserByIdRoute);
+app.use('/user', deleteUser);
 app.use("/user", favoritesRoute);
 app.use('/api', movieRoutes);
 app.use("/api/game", gameScoreRoutes);
 
-
 app.use("/api", addcommentsRoute); 
 app.use("/api", getcommentsRoute);
 app.use("/api", deletecommentRoute);
-
 app.use("/api/userProfilePicture", userProfilePictureRoutes);
 
-app.get('/api/movies', async (req, res) => {
-    const { title } = req.query;
-    if (!title) {
-        return res.status(400).json({ error: "Title is required" });
+// === New movie route handling ===
+app.get("/api/movie", async (req, res) => {
+  // Grabs the title from where it is submited in the page
+  const { title } = req.query;
+
+  if (!title) return res.status(400).json({ error: 'Missing movie title' });
+
+  try {
+    const url = `https://www.omdbapi.com/?apikey=${process.env.OMDB_API_KEY}&t=${encodeURIComponent(title)}`;
+    const response = await axios.get(url);
+
+    // Check if the response content is HTML
+    if (response.headers['content-type'].includes('html')) {
+      return res.status(500).json({ error: 'Invalid API response: HTML received from OMDB API' });
     }
 
-    try {
-        const apiKey = process.env.OMDB_API_KEY;
-        const omdbUrl = `https://www.omdbapi.com/?apikey=${apiKey}&t=${encodeURIComponent(title)}`;
-        const response = await axios.get(omdbUrl);
-        res.json(response.data);
-    } catch (error) {
-        console.error("Error fetching movie:", error);
-        res.status(500).json({ error: "Failed to fetch movie data" });
-    }
+    // Returns the JSON movie info 
+    res.json(response.data);
+  } catch (err) {
+    console.error('OMDb request failed:', err.message);
+    res.status(500).json({ error: 'Failed to fetch movie data' });
+  }
 });
 
-app.listen(SERVER_PORT, (req, res) => {
-    console.log(`The backend service is running on port ${SERVER_PORT} and waiting for requests.`);
-})
+app.listen(SERVER_PORT, () => {
+  console.log(`The backend service is running on port ${SERVER_PORT} and waiting for requests.`);
+});

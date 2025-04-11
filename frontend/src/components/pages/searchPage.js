@@ -21,20 +21,22 @@ const SearchMovie = () => {
   useEffect(() => {
     fetchMovie();
     const userInfo = getUserInfo();
+    console.log(userInfo)
     if (userInfo) setUser(userInfo);
   }, []);
 
+  
+
   const fetchMovie = async () => {
-    const apiKey = process.env.REACT_APP_OMDB_API_KEY;
     if (!title.trim()) {
       alert("Please enter a movie title.");
       return;
     }
-
+  
     try {
-      const response = await fetch(`https://www.omdbapi.com/?apikey=${apiKey}&t=${encodeURIComponent(title)}`);
+      const response = await fetch(`http://localhost:8081/api/movie?title=${encodeURIComponent(title)}`);
       const data = await response.json();
-
+  
       if (data.Response === "False") {
         setError(data.Error);
         setMovie(null);
@@ -44,7 +46,6 @@ const SearchMovie = () => {
         setError(null);
         fetchComments(data.imdbID); // Fetch comments for the movie
         checkIfFavorited(data.imdbID);
-
       }
     } catch (error) {
       console.error("Error fetching movie:", error);
@@ -53,16 +54,19 @@ const SearchMovie = () => {
       setComments([]);
     }
   };
+  
 
-  const fetchComments = async (movieId) => {
+  const fetchComments = async () => {
     try {
-      const response = await axios.get(`http://localhost:8081/api/movies/${movieId}/comments`);
-      console.log("Comments data:", response.data); // Debugging line
+      const response = await axios.get(`http://localhost:8081/api/movies/${movie.imdbID}/comments`);
       setComments(response.data);
     } catch (error) {
-      console.error("Error fetching comments:", error);
-      setComments([]);
+      console.error("Failed to fetch comments:", error);
     }
+  };
+
+  if (movie?.imdbID) {
+    fetchComments();
   };
 
   const checkIfFavorited = async (movieId) => {
@@ -154,10 +158,10 @@ const SearchMovie = () => {
     try {
       const response = await axios.delete(
         `http://localhost:8081/api/movies/${movie.imdbID}/comments/${commentId}`,
-        { 
-          data: { 
-            userId: user.id 
-          } 
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('accessToken')}`
+          }
         }
       );
   
@@ -166,22 +170,18 @@ const SearchMovie = () => {
         alert("Comment deleted successfully");
       }
     } catch (error) {
-      console.error("Delete error:", error);
-      
-      // Enhanced error handling
+      console.error("Delete error:", error.response || error.message);
       if (error.response) {
-        if (error.response.status === 403) {
-          alert(error.response.data.error);
-        } else if (error.response.status === 404) {
-          alert("Comment not found - it may have already been deleted");
-        } else {
-          alert("Failed to delete comment. Please try again.");
-        }
+        alert(`Error: ${error.response.status} - ${error.response.data.message}`);
       } else {
-        alert("Network error - please check your connection");
+        alert("Network or other error occurred");
       }
     }
   };
+  
+  
+  
+  
 
   return (
     <div className="container mt-4">
@@ -263,15 +263,16 @@ const SearchMovie = () => {
                   </div>
                   <p className="mb-0">{comment.text}</p>
                 </div>
-                {user?.id === comment.userId && (
-                  <Button
-                    variant="outline-danger"
-                    size="sm"
-                    onClick={() => deleteComment(comment._id)}
-                  >
-                    Delete
-                  </Button>
-                )}
+                {(user?.id === comment.userId || user?.role === "admin") && (
+  <Button
+    variant="outline-danger"
+    size="sm"
+    onClick={() => deleteComment(comment._id)}
+  >
+    Delete
+  </Button>
+)}
+
               </div>
             </div>
           ))
@@ -300,8 +301,6 @@ const SearchMovie = () => {
     </div>
   </div>
 )}
-
-      
     </div>
   );}
 export default SearchMovie;
