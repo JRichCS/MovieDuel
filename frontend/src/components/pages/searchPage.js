@@ -301,8 +301,6 @@ const SearchMovie = () => {
     </div>
   </div>
 )}
-
-      
     </div>
   );}
 export default SearchMovie;

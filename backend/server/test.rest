@@ -17,9 +17,6 @@ Content-Type: application/json
     "password" : "tochi12345"
 }
 
-###
-GET http://localhost:8081/user/getAll
-Content-Type: application/json
 
 ###
 GET  http://localhost:8081/user/getUserById

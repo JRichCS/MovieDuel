@@ -8,7 +8,7 @@ const generateAccessToken = (userId, email, username, role) => {
             id: userId,
             email,
             username,
-            role // This will be the correct role (admin/user)
+            role 
         },
         process.env.ACCESS_TOKEN_SECRET,
         {

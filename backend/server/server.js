@@ -5,11 +5,9 @@ const axios = require('axios');
 
 const userProfilePictureRoutes = require("./routes/userProfilePicture");
 const loginRoute = require('./routes/userLogin');
-const getAllUsersRoute = require('./routes/userGetAllUsers');
 const registerRoute = require('./routes/userSignUp');
 const getUserByIdRoute = require('./routes/userGetUserById');
 const dbConnection = require('./config/db.config');
-const editUser = require('./routes/userEditUser');
 const deleteUser = require('./routes/userDeleteAll');
 
 const favoritesRoute = require("./routes/userFavorites");
@@ -27,9 +25,7 @@ app.use(cors({ origin: '*' }));
 app.use(express.json());
 app.use('/user', loginRoute);
 app.use('/user', registerRoute);
-app.use('/user', getAllUsersRoute);
 app.use('/user', getUserByIdRoute);
-app.use('/user', editUser);
 app.use('/user', deleteUser);
 app.use("/user", favoritesRoute);
 
@@ -40,6 +36,7 @@ app.use("/api/userProfilePicture", userProfilePictureRoutes);
 
 // === New movie route handling ===
 app.get("/api/movie", async (req, res) => {
+  // Grabs the title from where it is submited in the page
   const { title } = req.query;
 
   if (!title) return res.status(400).json({ error: 'Missing movie title' });
@@ -53,6 +50,7 @@ app.get("/api/movie", async (req, res) => {
       return res.status(500).json({ error: 'Invalid API response: HTML received from OMDB API' });
     }
 
+    // Returns the JSON movie info 
     res.json(response.data);
   } catch (err) {
     console.error('OMDb request failed:', err.message);
