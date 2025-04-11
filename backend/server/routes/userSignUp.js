@@ -5,6 +5,7 @@ const bcrypt = require("bcrypt");
 const { newUserValidation } = require('../models/userValidator')
 const newUserModel = require('../models/userModel')
 
+// Route to create a profile in the database
 router.post('/signup', async (req, res) => {
     const { error } = newUserValidation(req.body);
     console.log(error)
@@ -29,11 +30,8 @@ router.post('/signup', async (req, res) => {
         email: email,
         password: hashPassword,
         role: role
-
-    
     });
 
-   
     try {
         const saveNewUser = await createUser.save();
         res.send(saveNewUser);

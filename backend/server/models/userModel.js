@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-//user schema/model
+// This schema defines the structure of the profile data in the database.
 const newUserSchema = new mongoose.Schema(
   {
     username: {
