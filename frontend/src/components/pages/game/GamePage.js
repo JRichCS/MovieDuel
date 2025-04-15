@@ -20,6 +20,24 @@ export default function GamePage() {
     }
   }, [gameStarted]);
 
+  useEffect(() => { // arrowkey support
+    const handleKeyDown = (event) => {
+      if (!gameStarted || gameOver || hasMadeChoice) return;
+  
+      if (event.key === "ArrowLeft") {
+        handleGuess(0);
+      } else if (event.key === "ArrowRight") {
+        handleGuess(1);
+      }
+    };
+  
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [gameStarted, gameOver, hasMadeChoice, movies]);
+  
+
   const fetchLeaderboard = async () => {
     try {
       const response = await axios.get("http://localhost:8081/api/game/leaderboard");
