@@ -22,8 +22,11 @@ async function fetchMovieDetails(tmdbMovieId) {
     const response = await axios.get(`${TMDB_BASE_URL}/movie/${tmdbMovieId}`, {
       params: {
         api_key: TMDB_API_KEY,
+        append_to_response: 'credits',
       },
+      
     });
+   // console.log(response.data);
 
     return response.data;
   } catch (error) {
@@ -65,6 +68,7 @@ async function saveMoviesToDB(movies) {
         continue;
       }
 
+      //console.log(movieDetails.credits.cast);
       const movieData = {
         imdbID: movieDetails.imdb_id || 'N/A',  // Use TMDB API to get IMDb ID
         title: movie.title,
@@ -82,13 +86,21 @@ async function saveMoviesToDB(movies) {
           : '',
         genre_ids: movie.genre_ids || [],
         original_language: movie.original_language || 'N/A',
-      };
+        actors: movieDetails.credits?.cast
+    ? movieDetails.credits.cast
+        .sort((a, b) => a.order - b.order)
+        .slice(0, 3)
+        .map(actor => actor.name)
+    : [],
 
+      };
       await Movie.updateOne(
         { imdbID: movieData.imdbID },
         { $set: movieData },
         { upsert: true }
       );
+
+      console.log(movieData);
 
     } catch (error) {
       console.error(`Error saving movie ${movie.title}:`, error.message);
@@ -111,7 +123,8 @@ async function main() {
 
     // Save them to the database
     await saveMoviesToDB(topMovies);
-
+    
+    
     console.log('Top 250 movies have been populated successfully.');
 
     // Disconnect from MongoDB
