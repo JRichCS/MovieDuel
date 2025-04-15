@@ -22,6 +22,7 @@ const HomePage = () => {
 
     const { id, email, username } = user;
 
+    
     return (
         <>
             <div className="card-container">

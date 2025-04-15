@@ -5,12 +5,13 @@ const bcrypt = require("bcrypt");
 const { newUserValidation } = require('../models/userValidator')
 const newUserModel = require('../models/userModel')
 
+// Route to create a profile in the database
 router.post('/signup', async (req, res) => {
     const { error } = newUserValidation(req.body);
     console.log(error)
     if (error) return res.status(400).send({ message: error.errors[0].message });
 
-    const { username, email, password } = req.body
+    const { username, email, password, role } = req.body
 
     //check if email already exists
     const user = await newUserModel.findOne({ username: username })
@@ -28,9 +29,9 @@ router.post('/signup', async (req, res) => {
         username: username,
         email: email,
         password: hashPassword,
+        role: role
     });
 
-   
     try {
         const saveNewUser = await createUser.save();
         res.send(saveNewUser);

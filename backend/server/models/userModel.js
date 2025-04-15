@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-//user schema/model
+// This schema defines the structure of the profile data in the database.
 const newUserSchema = new mongoose.Schema(
   {
     username: {
@@ -22,6 +22,12 @@ const newUserSchema = new mongoose.Schema(
       type: Date,
       default: Date.now,
     },
+    role: { 
+      type: String, 
+      enum: ['user', 'admin'], 
+      default: 'user' 
+    }
+
   },
   { collection: "users" }
 );

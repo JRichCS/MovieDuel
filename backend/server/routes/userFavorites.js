@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const FavoriteMovies = require("../models/favoriteMoviesModel");
 
-// Add a movie to favorites
+// Route to add a movie to favorites
 router.post("/:userId/favorites", async (req, res) => {
     console.log(`POST request received for user ${req.params.userId}`);
     try {
