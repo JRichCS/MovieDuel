@@ -44,6 +44,9 @@ const movieSchema = new mongoose.Schema(
     original_language: {
       type: String,
     },
+    actors: {
+      type: [String],
+    },
   },
   {
     collection: "movies",

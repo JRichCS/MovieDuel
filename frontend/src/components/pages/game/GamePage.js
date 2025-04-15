@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import MovieCard from "./movieCard"; // Ensure the case matches
+//import MovieCard from "./movieCard"; // Ensure the case matches
 import getUserInfo from "../../../utilities/decodeJwt";
 import "./GamePage.css";
 
@@ -128,6 +128,17 @@ export default function GamePage() {
     <div className="bg-gray-900 text-white min-h-screen flex flex-col items-center justify-center p-4">
       {gameStarted ? (
         <>
+        {message && (
+        <div
+           className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 
+            bg-gray-800 px-6 py-4 rounded-lg shadow-lg text-2xl font-semibold z-50
+            ${message === "Correct!" ? "text-green-400" : message === "Incorrect!" ? "text-red-400" : ""}`}
+        >
+          {message}
+        </div>
+
+  )}
+
           <h1 className="text-4xl font-bold mb-6">Which Movie Has the Higher IMDb Rating?</h1>
           {gameOver ? (
             <div className="bg-gray-800 p-8 rounded-lg shadow-xl text-center">
@@ -179,6 +190,8 @@ export default function GamePage() {
                     <h2 className="text-xl font-semibold mb-2">{movie.title}</h2>
                     <p className="text-gray-300 text-center mb-2">Release: {movie.release_date}</p>
                     <p className="text-gray-300 text-center mb-2">Genres: {movie.genre_names.join(", ")}</p>
+                    <p className="text-gray-300 text-center mb-2">Actors: {movie.actors.join(", ")}</p>
+
                     <p className="text-gray-200 text-center mb-4">{movie.overview}</p>
                     <button
                       onClick={() => handleGuess(index)}
@@ -190,9 +203,11 @@ export default function GamePage() {
                   </div>
                 ))}
               </div>
-              <p className="text-xl">{message}</p>
-              <p className="text-xl">Score: {score}</p>
-              <p className="text-xl">Wrong guesses: {wrongGuesses}/3</p>
+              <div className="fixed bottom-0 left-0 w-full bg-gray-800 text-white p-4 flex justify-center items-center space-x-8 text-xl">
+                <p>Score: {score}</p>
+                <p>Wrong guesses: {wrongGuesses}/3</p>
+              </div>
+
             </>
           )}
         </>
