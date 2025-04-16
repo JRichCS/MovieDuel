@@ -17,20 +17,6 @@ Content-Type: application/json
     "password" : "tochi12345"
 }
 
-###
-GET http://localhost:8081/user/getAll
-Content-Type: application/json
-
-###
-
-POST http://localhost:8081/user/editUser
-Content-Type: application/json 
-
-{
-    "userId" : "635ab8dfc407faf9f73deaf2",
-    "username" : "Tochi Edit",
-    "password" : "dwwrwr"
-}
 
 ###
 GET  http://localhost:8081/user/getUserById
@@ -83,3 +69,22 @@ Content-Type: application/json
 
 ### Get comments for a movie
 GET http://localhost:8081/api/movies/tt0084787/comments
+
+### Submit a new score for a user
+POST http://localhost:8081/api/game/65d5f3d2a3b4d8e1a2c9e4f6/score
+Content-Type: application/json
+
+{
+  "score": 7,
+  "username": "test"
+}
+
+###
+
+### Get top score for a user
+GET http://localhost:8081/api/game/65d5f3d2a3b4d8e1a2c9e4f6/scores
+
+###
+
+### Get top 10 leaderboard scores
+GET http://localhost:8081/api/game/leaderboard

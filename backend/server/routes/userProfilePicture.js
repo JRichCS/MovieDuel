@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const ProfilePicture = require("../models/profilePicture");
 
-// Update or create profile picture
+// Route to update or create profile picture
 router.post("/update", async (req, res) => {
   try {
     const { userId, pictureUrl } = req.body;
