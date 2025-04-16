@@ -14,13 +14,11 @@ const PrivateUserProfile = () => {
   const handleShow = () => setShow(true);
   const navigate = useNavigate();
 
-  // Handle logout button
   const handleLogout = () => {
     localStorage.clear();
     navigate("/");
   };
 
-  // Fetch user data
   useEffect(() => {
     const userInfo = getUserInfo();
     setUser(userInfo);
@@ -35,7 +33,6 @@ const PrivateUserProfile = () => {
     }
   }, []);
 
-  // Handle updating profile picture
   const updateProfilePicture = () => {
     if (!newPictureUrl) {
       alert("Please enter a valid image URL.");
@@ -61,12 +58,20 @@ const PrivateUserProfile = () => {
 
   if (!user) return <div><h4>Log in to view this page.</h4></div>;
 
+  const { username, id, email } = user;
+
   return (
     <div className="container">
       <div className="col-md-12 text-center">
-        <h1>{user.username}</h1>
-        <img src={profilePicture || "https://via.placeholder.com/150"} alt="Profile" className="rounded-circle" width="150" height="150" />
-        
+        <h1>{username}</h1>
+        <img
+          src={profilePicture || "https://via.placeholder.com/150"}
+          alt="Profile"
+          className="rounded-circle"
+          width="150"
+          height="150"
+        />
+
         <div className="col-md-12 text-center mt-3">
           <input
             type="text"
@@ -79,9 +84,26 @@ const PrivateUserProfile = () => {
             Update Profile Picture
           </Button>
 
-          <Button className="mt-2 ms-2" onClick={handleShow}>
-            Log Out
+          {/* Profile Info */}
+          <div className="grid gap-3 mt-4">
+            <div className="bg-dark text-white rounded-2xl p-3 shadow-lg">
+              <h3 className="text-xl font-semibold mb-2">👤 Username</h3>
+              <p className="text-lg">{username}</p>
+            </div>
+            <div className="bg-dark text-white rounded-2xl p-3 shadow-lg">
+              <h3 className="text-xl font-semibold mb-2">🆔 User ID</h3>
+              <p className="text-lg break-all">{id}</p>
+            </div>
+            <div className="bg-dark text-white rounded-2xl p-3 shadow-lg">
+              <h3 className="text-xl font-semibold mb-2">📧 Email</h3>
+              <p className="text-lg">{email}</p>
+            </div>
+          </div>
+
+          <Button className="mt-4" variant="danger" onClick={handleShow}>
+            🚪 Log Out
           </Button>
+
           <Modal show={show} onHide={handleClose} backdrop="static" keyboard={false}>
             <Modal.Header closeButton>
               <Modal.Title>Log Out</Modal.Title>
