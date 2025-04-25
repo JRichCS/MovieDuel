@@ -19,6 +19,9 @@ import Signup from "./components/pages/registerPage"
 
 import SearchMovie from "./components/pages/searchPage";
 import GamePage from './components/pages/game/GamePage';
+import FavPage from './components/pages/favoritesPage';
+
+
 
 
 export const UserContext = createContext();
@@ -41,6 +44,7 @@ const App = () => {
           <Route path="/privateUserProfile" element={<PrivateUserProfile />} />
           <Route exact path="/search" element={<SearchMovie />} />
           <Route path="/game" element={<GamePage />} />
+          <Route path="/favorite" element={<FavPage />} />
  
 
 

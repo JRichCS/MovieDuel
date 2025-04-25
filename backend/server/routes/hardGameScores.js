@@ -1,7 +1,7 @@
 // gamescoreRoute.js
 const express = require("express");
 const router = express.Router();
-const GameScore = require("../models/gamescoreModel");
+const HardGameScore = require("../models/hardGameScoreModel");
 
 // POST: Submit a new score
 router.post("/:userId/score", async (req, res) => {
@@ -9,13 +9,12 @@ router.post("/:userId/score", async (req, res) => {
     const { userId } = req.params;  // Extract userId from URL parameter
     const { username, score } = req.body;  // Extract username and score from request body
 
-    // Create a date in EST (New York time zone)
     const timestamp = new Date().toLocaleString("en-US", {
       timeZone: "America/New_York",
     });
 
     // Create a new game score with userId, username, and score
-    const newScore = new GameScore({
+    const newScore = new HardGameScore({
       userId,
       username,
       score,
@@ -36,7 +35,7 @@ router.get("/:userId/scores", async (req, res) => {
     const { userId } = req.params;  // Extract userId from URL parameter
 
     // Find the top score for the specific user
-    const topScore = await GameScore.findOne({ userId })
+    const topScore = await HardGameScore.findOne({ userId })
       .sort({ score: -1 })  // Sort scores in descending order
       .exec();
 
@@ -53,7 +52,7 @@ router.get("/:userId/scores", async (req, res) => {
 // GET: Get top scores (e.g., leaderboard)
 router.get("/leaderboard", async (req, res) => {
   try {
-    const topScores = await GameScore.find({})
+    const topScores = await HardGameScore.find({})
       .sort({ score: -1 })  // Sort by highest score
       .limit(10)  // Get the top 10 scores
 

@@ -12,7 +12,9 @@ const dbConnection = require('./config/db.config')
 
 const favoritesRoute = require("./routes/userFavorites");
 const movieRoutes = require('./routes/movieRoutes');
-const gameScoreRoutes = require('./routes/gameScores'); // Adjust path if needed
+const gameScoreRoutes = require('./routes/gameScores');
+const hardGameScoreRoutes = require("./routes/hardGameScores");
+
 
 const addcommentsRoute = require("./routes/userAddComment");
 const getcommentsRoute = require("./routes/userGetComment");
@@ -32,6 +34,7 @@ app.use('/user', getUserByIdRoute);
 app.use("/user", favoritesRoute);
 app.use('/api', movieRoutes);
 app.use("/api/game", gameScoreRoutes);
+app.use("/api/hardGame", hardGameScoreRoutes)
 
 app.use("/api", addcommentsRoute); 
 app.use("/api", getcommentsRoute);

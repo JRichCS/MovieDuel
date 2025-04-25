@@ -31,6 +31,8 @@ export default function Navbar() {
           <Nav.Link href="/privateUserProfile">Profile</Nav.Link>
           <Nav.Link href="/search">Search</Nav.Link>
           <Nav.Link href="/game">Game</Nav.Link>
+          <Nav.Link href="/favorite">Favorites</Nav.Link>
+
         </Nav>
 
         {user?.id && (
