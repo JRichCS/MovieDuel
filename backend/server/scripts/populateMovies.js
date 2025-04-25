@@ -1,133 +1,150 @@
-require('dotenv').config({ path: '../.env' }); // Adjust path if .env is outside the scripts folder
+require('dotenv').config({ path: '../.env' });
 
+const fs = require('fs');
+const path = require('path');
+const csv = require('csv-parser');
 const axios = require('axios');
 const mongoose = require('mongoose');
-const Movie = require('../models/movieModel.js'); // Adjust the path as necessary
+const Movie = require('../models/movieModel.js');
 
-const TMDB_API_KEY = "###"; //.env is broken since this file is in the scripts folder lol
+const TMDB_API_KEY = process.env.REACT_APP_TMDB_API_KEY;
 const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
-const DB_URL = process.env.DB_URL;  // MongoDB URL from .env
+const DB_URL = process.env.DB_URL;
+const CSV_FILE_PATH = path.join(__dirname, 'imdb_top_250.csv');
 
 if (!DB_URL) {
   console.error('MongoDB connection URL is not defined in the .env file');
-  process.exit(1); // Exit if no DB_URL is found
+  process.exit(1);
 }
 
-const TOTAL_MOVIES = 250;
-const MOVIES_PER_PAGE = 20;
-const TOTAL_PAGES = Math.ceil(TOTAL_MOVIES / MOVIES_PER_PAGE);
+if (!TMDB_API_KEY) {
+  console.error('TMDB API key is not defined in the .env file');
+  process.exit(1);
+}
 
-async function fetchMovieDetails(tmdbMovieId) {
+async function readCSV() {
+  return new Promise((resolve, reject) => {
+    const results = [];
+
+    fs.createReadStream(CSV_FILE_PATH)
+      .pipe(csv())
+      .on('data', (data) => results.push(data))
+      .on('end', () => resolve(results))
+      .on('error', reject);
+  });
+}
+
+async function getTMDBFromIMDb(imdbID) {
   try {
-    const response = await axios.get(`${TMDB_BASE_URL}/movie/${tmdbMovieId}`, {
+    const response = await axios.get(`${TMDB_BASE_URL}/find/${imdbID}`, {
       params: {
         api_key: TMDB_API_KEY,
-        append_to_response: 'credits',
+        external_source: 'imdb_id',
       },
-      
     });
-   // console.log(response.data);
 
-    return response.data;
-  } catch (error) {
-    console.error(`Error fetching movie details for TMDB ID ${tmdbMovieId}:`, error.message);
+    const movie = response.data.movie_results?.[0];
+    return movie || null;
+  } catch (err) {
+    console.error(`Failed to look up TMDB movie for ${imdbID}: ${err.message}`);
     return null;
   }
 }
 
-async function fetchTopMovies() {
-  const movies = [];
-
-  for (let page = 1; page <= TOTAL_PAGES; page++) {
-    try {
-      const response = await axios.get(`${TMDB_BASE_URL}/discover/movie`, {
-        params: {
-          api_key: TMDB_API_KEY,
-          sort_by: 'vote_count.desc',
-          vote_count_gte: 1000,
-          page,
-        },
-      });
-
-      movies.push(...response.data.results);
-    } catch (error) {
-      console.error(`Error fetching page ${page}:`, error.message);
-    }
+async function fetchMovieDetails(tmdbID) {
+  try {
+    const response = await axios.get(`${TMDB_BASE_URL}/movie/${tmdbID}`, {
+      params: {
+        api_key: TMDB_API_KEY,
+        append_to_response: 'credits',
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching details for TMDB ID ${tmdbID}:`, error.message);
+    return null;
   }
-
-  return movies.slice(0, TOTAL_MOVIES);
 }
 
-async function saveMoviesToDB(movies) {
-  for (const movie of movies) {
+async function saveMoviesToDB(moviesFromCSV) {
+  for (let index = 0; index < moviesFromCSV.length; index++) {
+    const csvRow = moviesFromCSV[index];
+    const imdbID = csvRow.imdb_id?.trim();
+    const IMDBRating = parseFloat(csvRow.rating);
+    const Top250Ranking = index + 1;
+
+    if (!imdbID || isNaN(IMDBRating)) {
+      console.warn(`Skipping invalid row: ${JSON.stringify(csvRow)}`);
+      continue;
+    }
+
     try {
-      // Get IMDb ID by fetching movie details
-      const movieDetails = await fetchMovieDetails(movie.id);
-      if (!movieDetails) {
-        console.error(`Skipping movie ${movie.title} due to missing details`);
+      const tmdbBasic = await getTMDBFromIMDb(imdbID);
+      if (!tmdbBasic) {
+        console.warn(`No TMDB match found for IMDb ID: ${imdbID}`);
         continue;
       }
 
-      //console.log(movieDetails.credits.cast);
-      const movieData = {
-        imdbID: movieDetails.imdb_id || 'N/A',  // Use TMDB API to get IMDb ID
-        title: movie.title,
-        original_title: movie.original_title || 'N/A',
-        overview: movie.overview || 'N/A',
-        release_date: movie.release_date || 'N/A',
-        vote_average: movie.vote_average || 0,
-        vote_count: movie.vote_count || 0,
-        popularity: movie.popularity || 0,
-        poster_path: movie.poster_path
-          ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
-          : '',
-        backdrop_path: movie.backdrop_path
-          ? `https://image.tmdb.org/t/p/w500${movie.backdrop_path}`
-          : '',
-        genre_ids: movie.genre_ids || [],
-        original_language: movie.original_language || 'N/A',
-        actors: movieDetails.credits?.cast
-    ? movieDetails.credits.cast
-        .sort((a, b) => a.order - b.order)
-        .slice(0, 3)
-        .map(actor => actor.name)
-    : [],
+      const movieDetails = await fetchMovieDetails(tmdbBasic.id);
+      if (!movieDetails) {
+        console.warn(`No details found for TMDB ID: ${tmdbBasic.id}`);
+        continue;
+      }
 
+      const movieData = {
+        imdbID,
+        title: movieDetails.title,
+        original_title: movieDetails.original_title || 'N/A',
+        overview: movieDetails.overview || 'N/A',
+        release_date: movieDetails.release_date || 'N/A',
+        vote_average: movieDetails.vote_average || 0,
+        vote_count: movieDetails.vote_count || 0,
+        popularity: movieDetails.popularity || 0,
+        poster_path: movieDetails.poster_path
+          ? `https://image.tmdb.org/t/p/w500${movieDetails.poster_path}`
+          : '',
+        backdrop_path: movieDetails.backdrop_path
+          ? `https://image.tmdb.org/t/p/w500${movieDetails.backdrop_path}`
+          : '',
+        genre_ids: movieDetails.genres?.map(g => g.id) || [],
+        genre_names: movieDetails.genres?.map(g => g.name) || [],
+        original_language: movieDetails.original_language || 'N/A',
+        actors: movieDetails.credits?.cast
+          ? movieDetails.credits.cast
+              .sort((a, b) => a.order - b.order)
+              .slice(0, 3)
+              .map((actor) => actor.name)
+          : [],
+        IMDBRating,
+        Top250Ranking,
       };
+
       await Movie.updateOne(
-        { imdbID: movieData.imdbID },
+        { imdbID },
         { $set: movieData },
         { upsert: true }
       );
 
-      console.log(movieData);
-
+      console.log(`Saved: ${movieData.title} (Rank ${Top250Ranking})`);
     } catch (error) {
-      console.error(`Error saving movie ${movie.title}:`, error.message);
+      console.error(`Error saving movie ${imdbID}:`, error.message);
     }
   }
 }
 
 async function main() {
   try {
-    // Connect to MongoDB using the DB_URL from .env file
     await mongoose.connect(DB_URL, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
 
-    console.log('Connected to MongoDB');
+    console.log('🛠️  Connected to MongoDB');
 
-    // Fetch the top 250 movies
-    const topMovies = await fetchTopMovies();
+    const moviesFromCSV = await readCSV();
+    await saveMoviesToDB(moviesFromCSV);
 
-    // Save them to the database
-    await saveMoviesToDB(topMovies);
-    
-    
-    console.log('Top 250 movies have been populated successfully.');
-
-    // Disconnect from MongoDB
+    console.log('All movies updated successfully.');
     mongoose.disconnect();
   } catch (error) {
     console.error('Error in main execution:', error.message);

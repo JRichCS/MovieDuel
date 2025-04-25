@@ -1,10 +1,10 @@
-// gamescoreModel.js
+// hardGameScoreModel.js
 const mongoose = require("mongoose");
 
-const gameScoreSchema = new mongoose.Schema({
+const hardGameScoreSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "users", // must match exactly
+    ref: "users",
     required: true,
   },
   username:{
@@ -18,4 +18,4 @@ const gameScoreSchema = new mongoose.Schema({
   timestamp: { type: String },
 });
 
-module.exports = mongoose.model("GameScore", gameScoreSchema);
+module.exports = mongoose.model("HardGameScore", hardGameScoreSchema);
