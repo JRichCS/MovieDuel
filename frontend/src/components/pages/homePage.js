@@ -42,7 +42,7 @@ const HomePage = () => {
         Click on your profile in the navbar to view your account details like username, email, and user ID.
         You can also personalize your profile by updating your picture with a custom image URL.
       </p>
-      <Button variant="primary" className="mt-2" onClick={() => navigate("/profile")}>
+      <Button variant="primary" className="mt-2" onClick={() => navigate("/privateUserProfile")}>
         Go to My Profile
       </Button>
 

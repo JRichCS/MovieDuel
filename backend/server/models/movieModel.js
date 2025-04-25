@@ -47,6 +47,12 @@ const movieSchema = new mongoose.Schema(
     actors: {
       type: [String],
     },
+    IMDBRating: {
+      type: Number,
+    },
+    Top250Ranking: {
+      type: Number,
+    },
   },
   {
     collection: "movies",
