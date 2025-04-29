@@ -13,7 +13,7 @@ const SearchMovie = () => {
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
   const [user, setUser] = useState(null);
-  const [title, setTitle] = useState('The Founder');
+  const [title, setTitle] = useState('Cars 4');
   const [error, setError] = useState(null);
   const [isFavorited, setIsFavorited] = useState(false);
   const navigate = useNavigate();
